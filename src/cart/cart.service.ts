@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cart } from './entities/cart.entity';
@@ -28,6 +32,9 @@ export class CartService {
       cart = await this.cartRepository.save(cart);
     }
 
+    if (!cart.items || cart.items.length === 0) {
+      return { ...cart, subtotal: '0.00', totalItems: 0, items: [] };
+    }
     const subtotal = cart.items.reduce(
       (sum, item) => sum + Number(item.product.price) * item.quantity,
       0,

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Order, OrderStatus } from './entities/order.entity';
@@ -68,18 +72,20 @@ export class OrdersService {
 
     await this.orderItemRepository.save(orderItems);
 
-    // Clear cart
+    // Clear cart items
     await this.cartRepository
       .createQueryBuilder()
-      .relation(Cart, 'items')
-      .of(cart)
-      .remove(cart.items);
+      .delete()
+      .from('cart_items')
+      .where('cartId = :cartId', { cartId: cart.id })
+      .execute();
 
     return this.findOne(savedOrder.id);
   }
 
   async findAll(userId?: string, userRole?: string) {
-    const query = this.orderRepository.createQueryBuilder('order')
+    const query = this.orderRepository
+      .createQueryBuilder('order')
       .leftJoinAndSelect('order.items', 'items')
       .leftJoinAndSelect('items.product', 'product')
       .orderBy('order.createdAt', 'DESC');
