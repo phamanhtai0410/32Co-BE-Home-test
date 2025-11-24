@@ -1,0 +1,190 @@
+# E-commerce API Test Requests
+# Use REST Client extension in VS Code to run these requests
+# Or use any HTTP client like Postman, Insomnia, etc.
+
+@baseUrl = http://localhost:3000
+@customerToken = your_customer_token_here
+@adminToken = your_admin_token_here
+@categoryId = your_category_id_here
+@productId = your_product_id_here
+@cartItemId = your_cart_item_id_here
+@orderId = your_order_id_here
+
+### ===========================
+### AUTHENTICATION
+### ===========================
+
+### Register Customer
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "customer@test.com",
+  "password": "customer123",
+  "name": "Test Customer"
+}
+
+### Register Admin (you may need to modify role in DB)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "admin@test.com",
+  "password": "admin123",
+  "name": "Test Admin"
+}
+
+### Login Customer
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "customer@example.com",
+  "password": "customer123"
+}
+
+### Login Admin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "admin123"
+}
+
+### ===========================
+### CATEGORIES
+### ===========================
+
+### Get All Categories (Public)
+GET {{baseUrl}}/categories
+
+### Get Category by ID
+GET {{baseUrl}}/categories/{{categoryId}}
+
+### Create Category (Admin Only)
+POST {{baseUrl}}/categories
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Electronics",
+  "description": "Electronic devices and accessories"
+}
+
+### Update Category (Admin Only)
+PATCH {{baseUrl}}/categories/{{categoryId}}
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "description": "Updated description for electronics category"
+}
+
+### Delete Category (Admin Only)
+DELETE {{baseUrl}}/categories/{{categoryId}}
+Authorization: Bearer {{adminToken}}
+
+### ===========================
+### PRODUCTS
+### ===========================
+
+### Get All Products (Public) - With Pagination
+GET {{baseUrl}}/products?page=1&limit=10
+
+### Get Products with Filters
+GET {{baseUrl}}/products?page=1&limit=10&categoryId={{categoryId}}&minPrice=50&maxPrice=500
+
+### Get Product by ID
+GET {{baseUrl}}/products/{{productId}}
+
+### Create Product (Admin Only)
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Laptop Dell XPS 15",
+  "description": "High-performance laptop with 16GB RAM and 512GB SSD",
+  "price": 1299.99,
+  "stockQuantity": 50,
+  "categoryId": "{{categoryId}}"
+}
+
+### Update Product (Admin Only)
+PATCH {{baseUrl}}/products/{{productId}}
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "price": 1199.99,
+  "stockQuantity": 45
+}
+
+### Delete Product (Admin Only)
+DELETE {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{adminToken}}
+
+### ===========================
+### CART
+### ===========================
+
+### Get My Cart
+GET {{baseUrl}}/cart
+Authorization: Bearer {{customerToken}}
+
+### Add Product to Cart
+POST {{baseUrl}}/cart/items
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "productId": "{{productId}}",
+  "quantity": 2
+}
+
+### Update Cart Item Quantity
+PATCH {{baseUrl}}/cart/items/{{cartItemId}}
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+{
+  "quantity": 5
+}
+
+### Remove Item from Cart
+DELETE {{baseUrl}}/cart/items/{{cartItemId}}
+Authorization: Bearer {{customerToken}}
+
+### Clear Cart
+DELETE {{baseUrl}}/cart
+Authorization: Bearer {{customerToken}}
+
+### ===========================
+### ORDERS
+### ===========================
+
+### Create Order from Cart
+POST {{baseUrl}}/orders
+Content-Type: application/json
+Authorization: Bearer {{customerToken}}
+
+### Get My Orders
+GET {{baseUrl}}/orders/my-orders
+Authorization: Bearer {{customerToken}}
+
+### Get All Orders (Customer sees own, Admin sees all)
+GET {{baseUrl}}/orders
+Authorization: Bearer {{customerToken}}
+
+### Get Order by ID
+GET {{baseUrl}}/orders/{{orderId}}
+Authorization: Bearer {{customerToken}}
+
+### ===========================
+### ADMIN OPERATIONS
+### ===========================
+
+### Get All Orders (Admin View)
+GET {{baseUrl}}/orders
+Authorization: Bearer {{adminToken}}
